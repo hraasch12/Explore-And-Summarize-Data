@@ -13,7 +13,7 @@ library(gridExtra)
 
 ```
 
-```{r echo=FALSE, Load_the_Data}
+```{r echo=FALSE, message=FALSE, warning=FALSE, Load_the_Data}
 #Change working directory
 setwd("C:/Users/Heidi/Documents/Explore and Summarize Data")
 # Load the Data
@@ -28,7 +28,7 @@ between red wine attributes and quality.
 # Univariate Plots Section
 
 
-```{r echo=FALSE, Univariate_Plots}
+```{r echo=FALSE, message=FALSE, warning=FALSE, Univariate_Plots}
 # First we should take a glimpse into our data to see what we're working with.
 glimpse(wine)
 
@@ -39,7 +39,7 @@ that variable going foward.
 
 #Examine histograms of all variables
 
-```{r echo=FALSE, Univariate_Plots2}
+```{r echo=FALSE, message=FALSE, warning=FALSE, Univariate_Plots2}
 #I used the reshape library to melt the wide data and then visualize the data 
 #distribution for each variable using boxplots.  
 
@@ -56,7 +56,7 @@ outliers in the residual.sugar, sulphates and chlorides variables that make it
 difficult to properly view the distribution. To make the distributions of these 
 3 variables easier to see we will exclude the 95 percentile.
 
-```{r echo=FALSE, Univariate_Plots3}
+```{r echo=FALSE, message=FALSE, warning=FALSE, Univariate_Plots3}
 p1 <- ggplot(wine, aes(x=residual.sugar)) + 
   geom_histogram() + 
   xlim(0, quantile(wine$residual.sugar, c(0.95)))    
@@ -77,7 +77,7 @@ I am most interested in the quality of the wines and what variables have an
 impact on the quality.
 
 #Quality
-```{r echo=FALSE, Univariate_Plots4}
+```{r echo=FALSE, message=FALSE, warning=FALSE, Univariate_Plots4}
 ggplot(data = wine, aes(x = quality)) +
   geom_histogram()
 
@@ -87,7 +87,7 @@ The majority of the wines are of average quality (4-5) and there are few wines
 with low or high quality. The lowest quality is 3 and the highest quality is 8. 
 
 #PH
-```{r echo=FALSE, Univariate_Plots5}
+```{r echo=FALSE, message=FALSE, warning=FALSE, Univariate_Plots5}
 
 ggplot(data = wine, aes(x = pH)) +
   geom_histogram()
@@ -103,7 +103,7 @@ lower than 3.0.
 
 Alcohol is another important factor of red wines. I will explore that next.  
 
-```{r echo=FALSE, Univariate_Plots6}
+```{r echo=FALSE, message=FALSE, warning=FALSE, Univariate_Plots6}
 
 ggplot(data = wine, aes(x = alcohol)) +
   geom_histogram()
@@ -152,7 +152,7 @@ the outliers which resulted in normal distributions.
 
 # Bivariate Plots Section
 
-```{r echo=FALSE, Bivariate_Plots}
+```{r echo=FALSE, message=FALSE, warning=FALSE, Bivariate_Plots}
 with(wine, cor.test(quality, fixed.acidity))
 with(wine, cor.test(quality, volatile.acidity))
 with(wine, cor.test(quality, citric.acid))
@@ -173,7 +173,7 @@ The top 4 correlation coefficents to the quality of the wine are:
   Citric Acid: 0.23
   Fixed Acidity: 0.12
 
-```{r echo=FALSE, Bivariate_Plots2}
+```{r echo=FALSE, message=FALSE, warning=FALSE, Bivariate_Plots2}
 p1 <- ggplot(wine, aes(x = alcohol, y = quality)) + 
   geom_point() +
   geom_smooth(method = 'lm', color = 'red')
@@ -195,7 +195,7 @@ sulphates, citric acid, and fixed acidity increase.
 Lets take a look at some of the correlations between alcohol and some of the
 other variables. 
 
-```{r echo=FALSE, Bivariate_Plots3}
+```{r echo=FALSE, message=FALSE, warning=FALSE, Bivariate_Plots3}
 with(wine, cor.test(alcohol, fixed.acidity))
 with(wine, cor.test(alcohol, volatile.acidity))
 with(wine, cor.test(alcohol, citric.acid))
@@ -214,7 +214,7 @@ The variables with the highest (positive or negative) correlations are:
   pH: 0.21
   Volatile Acidity: -0.20
 
-```{r echo=FALSE, Bivariate_Plots4}
+```{r echo=FALSE, message=FALSE, warning=FALSE, Bivariate_Plots4}
 p1 <- ggplot(wine, aes(x = density, y = alcohol)) + 
   geom_point() +
   geom_smooth(method = 'lm', color = 'blue')
@@ -238,7 +238,7 @@ increase with the amount of alcohol.
 Lets explore the correlation between pH, citric acid, volatile acidity, and
 fixed acidity. 
 
-```{r echo=FALSE, Bivariate_Plots5}
+```{r echo=FALSE, message=FALSE, warning=FALSE, Bivariate_Plots5}
 p1 <- ggplot(wine, aes(x = citric.acid, y = pH)) + 
   geom_point() +
   geom_smooth(method = 'lm', color = 'green')
@@ -284,7 +284,7 @@ The strongest relationship was between the quality and alcohol in the wine.
 
 # Multivariate Plots Section
 
-```{r echo=FALSE, Multivariate_Plots}
+```{r echo=FALSE, message=FALSE, warning=FALSE, Multivariate_Plots}
 ggplot(wine, aes(x=volatile.acidity, y=pH, size = alcohol, 
                  color=factor(quality))) + 
   geom_point() + 
@@ -296,7 +296,7 @@ We see that a higher concentration of the darker dots are located on the left
 side of the plot. This indicates the higher quality wines. This is also where 
 we see the larger dots representing the wines with a higher alcohol content. 
 
-```{r echo=FALSE, Multivariate_Plots2}
+```{r echo=FALSE, message=FALSE, warning=FALSE, Multivariate_Plots2}
 ggplot(wine, aes(x = pH, y = alcohol, 
                  colour=factor(wine$quality))) + 
   geom_density2d(bins=2) + 
@@ -308,7 +308,7 @@ ggplot(wine, aes(x = pH, y = alcohol,
 Here we see the higher quality wines represented by the darker lines. We see 
 they lay close to the center of the plot. 
 
-```{r echo=FALSE, Multivariate_Plots3}
+```{r echo=FALSE, message=FALSE, warning=FALSE, Multivariate_Plots3}
 empty <- ggplot()+geom_point(aes(1,1), colour="white") +
      theme(                              
        plot.background = element_blank(), 
@@ -367,7 +367,7 @@ The relationship between pH and alcohol is interesting.
 
 
 ### Plot One
-```{r echo=FALSE, Plot_One}
+```{r echo=FALSE, message=FALSE, warning=FALSE, Plot_One}
 ggplot(wine, aes(x = alcohol, y = quality)) + 
   geom_jitter() +
   ylab("Quality Rating")+
@@ -385,7 +385,7 @@ content increase. We see a high concentration of the points in the middle
 of the quality axis.
 
 ### Plot Two
-```{r echo=FALSE, Plot_Two}
+```{r echo=FALSE, message=FALSE, warning=FALSE, Plot_Two}
 ggplot(wine, aes(x = pH , y = alcohol)) + 
   geom_point() +
   ylab("Alcohol (% by Volume)")+
@@ -404,7 +404,7 @@ points are more spread out as the alcohol content gets higher and they get more
 condensed the lower the alcohol content is. 
 
 ### Plot Three
-```{r echo=FALSE, Plot_Three}
+```{r echo=FALSE, message=FALSE, warning=FALSE, Plot_Three}
 empty <- ggplot()+geom_point(aes(1,1), colour="white") +
      theme(                              
        plot.background = element_blank(), 
