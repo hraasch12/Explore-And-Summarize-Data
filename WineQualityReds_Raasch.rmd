@@ -1,0 +1,454 @@
+Wine Quality Reds by Heidi Raasch
+========================================================
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages}
+
+library(ggplot2)
+library(dplyr)
+library(GGally)
+library(RColorBrewer)
+library(reshape)
+library(gridExtra)
+
+```
+
+```{r echo=FALSE, Load_the_Data}
+#Change working directory
+setwd("C:/Users/Heidi/Documents/Explore and Summarize Data")
+# Load the Data
+wine <- read.csv('wineQualityReds.csv')
+
+```
+
+This report explores a dataset containing information on the relationship
+between red wine attributes and quality. 
+ 
+
+# Univariate Plots Section
+
+
+```{r echo=FALSE, Univariate_Plots}
+# First we should take a glimpse into our data to see what we're working with.
+glimpse(wine)
+
+```
+
+X appears to be a index for each row of the data. Therefore, we will exclude 
+that variable going foward. 
+
+#Examine histograms of all variables
+
+```{r echo=FALSE, Univariate_Plots2}
+#I used the reshape library to melt the wide data and then visualize the data 
+#distribution for each variable using boxplots.  
+
+meltData <- melt(wine[2:13])
+
+ggplot(meltData, aes(x = value)) + 
+    facet_wrap(~variable,scales = "free_x") + 
+    geom_histogram()
+
+```
+
+We can see that most of the variables have a normal distribution. There are 
+outliers in the residual.sugar, sulphates and chlorides variables that make it 
+difficult to properly view the distribution. To make the distributions of these 
+3 variables easier to see we will exclude the 95 percentile.
+
+```{r echo=FALSE, Univariate_Plots3}
+p1 <- ggplot(wine, aes(x=residual.sugar)) + 
+  geom_histogram() + 
+  xlim(0, quantile(wine$residual.sugar, c(0.95)))    
+p2 <- ggplot(wine, aes(x=chlorides)) + 
+  geom_histogram() + 
+  xlim(0, quantile(wine$chlorides, c(0.95)))
+p3 <- ggplot(wine, aes(x=sulphates)) + 
+  geom_histogram() + 
+  xlim(0, quantile(wine$sulphates, c(0.95)))
+grid.arrange(p1, p2, p3, ncol=3)
+
+```
+
+After removing the outliers we can see the distributions of residual.sugar, 
+chlorides, and sulphates are also normal. 
+
+I am most interested in the quality of the wines and what variables have an 
+impact on the quality.
+
+#Quality
+```{r echo=FALSE, Univariate_Plots4}
+ggplot(data = wine, aes(x = quality)) +
+  geom_histogram()
+
+```
+
+The majority of the wines are of average quality (4-5) and there are few wines 
+with low or high quality. The lowest quality is 3 and the highest quality is 8. 
+
+#PH
+```{r echo=FALSE, Univariate_Plots5}
+
+ggplot(data = wine, aes(x = pH)) +
+  geom_histogram()
+
+```
+
+The distribution of the pH of the wines is similar to the distribution of the 
+quality of the wines. It is a normal distribution with a majority of the wines 
+having a pH between 3.0 and 3.7 with a few wines having a pH higher than 3.7 or
+lower than 3.0.
+
+#Alcohol
+
+Alcohol is another important factor of red wines. I will explore that next.  
+
+```{r echo=FALSE, Univariate_Plots6}
+
+ggplot(data = wine, aes(x = alcohol)) +
+  geom_histogram()
+
+```
+
+Unlike pH and qality we see that alcohol is right skewed. We see a 
+majority of the wines have an alcohol content that falls on the left side of
+the plot. 
+
+
+# Univariate Analysis
+
+### What is the structure of your dataset?
+
+The dataset has 12 variables representing 1599 observations. Each observation 
+corresponds to a red wine sample. 11 of the variables correspond to the result
+of a physicochemical test and the last variable (quality) corresponds to the 
+result of a sensory panel rating.
+
+### What is/are the main feature(s) of interest in your dataset?
+
+The main feature of interest in this dataset is quality. 
+
+### What other features in the dataset do you think will help support your \
+investigation into your feature(s) of interest?
+
+Each of the physicochemical variables will help support the investigation as 
+they each can impact the taste and quality of the wine. Also, I expect that 
+some of the variables will have a high correlation to each other. 
+
+### Did you create any new variables from existing variables in the dataset?
+
+I created the meltData variable which made use of the reshape library to melt 
+the wide data.  
+
+
+### Of the features you investigated, were there any unusual distributions? \
+Did you perform any operations on the data to tidy, adjust, or change the form \
+of the data? If so, why did you do this?
+
+Originally the residual.sugar, sulphates and chlorides variables had skewed
+distributions that contained outliers. I excluded the 95th percentile to remove
+the outliers which resulted in normal distributions. 
+
+
+# Bivariate Plots Section
+
+```{r echo=FALSE, Bivariate_Plots}
+with(wine, cor.test(quality, fixed.acidity))
+with(wine, cor.test(quality, volatile.acidity))
+with(wine, cor.test(quality, citric.acid))
+with(wine, cor.test(quality, residual.sugar))
+with(wine, cor.test(quality, chlorides))
+with(wine, cor.test(quality, free.sulfur.dioxide))
+with(wine, cor.test(quality, density))
+with(wine, cor.test(quality,  pH))
+with(wine, cor.test(quality, sulphates))
+with(wine, cor.test(quality, alcohol))
+
+#summary(wine)
+```
+
+The top 4 correlation coefficents to the quality of the wine are:
+  Alcohol: 0.48
+  Sulphates: 0.25
+  Citric Acid: 0.23
+  Fixed Acidity: 0.12
+
+```{r echo=FALSE, Bivariate_Plots2}
+p1 <- ggplot(wine, aes(x = alcohol, y = quality)) + 
+  geom_point() +
+  geom_smooth(method = 'lm', color = 'red')
+p2 <- ggplot(wine, aes(x = sulphates, y = quality)) + 
+  geom_point() +
+  geom_smooth(method = 'lm', color = 'red')
+p3 <- ggplot(wine, aes(x = citric.acid, y = quality)) + 
+  geom_point() +
+  geom_smooth(method = 'lm', color = 'red')
+p4 <- ggplot(wine, aes(x = fixed.acidity, y = quality)) + 
+  geom_point() +
+  geom_smooth(method = 'lm', color = 'red')
+grid.arrange(p1, p2, p3, p4, ncol=2, nrow=2)
+
+```
+We can see that the quality of the wine increases with as the alcohol, 
+sulphates, citric acid, and fixed acidity increase. 
+
+Lets take a look at some of the correlations between alcohol and some of the
+other variables. 
+
+```{r echo=FALSE, Bivariate_Plots3}
+with(wine, cor.test(alcohol, fixed.acidity))
+with(wine, cor.test(alcohol, volatile.acidity))
+with(wine, cor.test(alcohol, citric.acid))
+with(wine, cor.test(alcohol, residual.sugar))
+with(wine, cor.test(alcohol, chlorides))
+with(wine, cor.test(alcohol, free.sulfur.dioxide))
+with(wine, cor.test(alcohol, density))
+with(wine, cor.test(alcohol,  pH))
+with(wine, cor.test(alcohol, sulphates))
+
+```
+
+The variables with the highest (positive or negative) correlations are:
+  Density: -0.50
+  Chlorides: -0.22
+  pH: 0.21
+  Volatile Acidity: -0.20
+
+```{r echo=FALSE, Bivariate_Plots4}
+p1 <- ggplot(wine, aes(x = density, y = alcohol)) + 
+  geom_point() +
+  geom_smooth(method = 'lm', color = 'blue')
+p2 <- ggplot(wine, aes(x = chlorides, y = alcohol)) + 
+  geom_point() +
+  geom_smooth(method = 'lm', color = 'blue')
+p3 <- ggplot(wine, aes(x = pH , y = alcohol)) + 
+  geom_point() +
+  geom_smooth(method = 'lm', color = 'blue')
+p4 <- ggplot(wine, aes(x = volatile.acidity, y = alcohol)) + 
+  geom_point() +
+  geom_smooth(method = 'lm', color = 'blue')
+grid.arrange(p1, p2, p3, p4, ncol=2, nrow=2)
+
+```
+
+We can see that the density, chlorides, and volatile acidity of the wine 
+decrease with the amount of alcohol in the wine. Whereas the pH tends to 
+increase with the amount of alcohol. 
+
+Lets explore the correlation between pH, citric acid, volatile acidity, and
+fixed acidity. 
+
+```{r echo=FALSE, Bivariate_Plots5}
+p1 <- ggplot(wine, aes(x = citric.acid, y = pH)) + 
+  geom_point() +
+  geom_smooth(method = 'lm', color = 'green')
+p2 <- ggplot(wine, aes(x = volatile.acidity, y = pH)) + 
+  geom_point() +
+  geom_smooth(method = 'lm', color = 'green')
+p3 <- ggplot(wine, aes(x = fixed.acidity , y = pH)) + 
+  geom_point() +
+  geom_smooth(method = 'lm', color = 'green')
+
+grid.arrange(p1, p2, p3, nrow= 2, ncol=2)
+
+```
+
+Here we can see that the pH decreases as the citric acid and fixed acidity 
+increase whereas the pH increases as the volatile acidity increases. 
+
+# Bivariate Analysis
+
+### Talk about some of the relationships you observed in this part of the \
+investigation. How did the feature(s) of interest vary with other features in \
+the dataset?
+
+The quality of the wine increases with as the alcohol, sulphates, citric acid, 
+and fixed acidity increase.
+
+The density, chlorides, and volatile acidity of the wine 
+decrease with the amount of alcohol in the wine. Whereas the pH tends to 
+increase with the amount of alcohol. 
+
+The pH decreases as the citric acid and fixed acidity increase whereas the 
+pH increases as the volatile acidity increases.
+
+### Did you observe any interesting relationships between the other features \
+(not the main feature(s) of interest)?
+
+I found it interesting that the density decreases with the amount of alcohol 
+in the wine.
+
+### What was the strongest relationship you found?
+
+The strongest relationship was between the quality and alcohol in the wine. 
+
+# Multivariate Plots Section
+
+```{r echo=FALSE, Multivariate_Plots}
+ggplot(wine, aes(x=volatile.acidity, y=pH, size = alcohol, 
+                 color=factor(quality))) + 
+  geom_point() + 
+  scale_color_brewer()
+
+```
+
+We see that a higher concentration of the darker dots are located on the left 
+side of the plot. This indicates the higher quality wines. This is also where 
+we see the larger dots representing the wines with a higher alcohol content. 
+
+```{r echo=FALSE, Multivariate_Plots2}
+ggplot(wine, aes(x = pH, y = alcohol, 
+                 colour=factor(wine$quality))) + 
+  geom_density2d(bins=2) + 
+  scale_color_brewer() + 
+  geom_point(color="black", alpha=0.1) 
+
+```
+
+Here we see the higher quality wines represented by the darker lines. We see 
+they lay close to the center of the plot. 
+
+```{r echo=FALSE, Multivariate_Plots3}
+empty <- ggplot()+geom_point(aes(1,1), colour="white") +
+     theme(                              
+       plot.background = element_blank(), 
+       panel.grid.major = element_blank(), 
+       panel.grid.minor = element_blank(), 
+       panel.border = element_blank(), 
+       panel.background = element_blank(),
+       axis.title.x = element_blank(),
+       axis.title.y = element_blank(),
+       axis.text.x = element_blank(),
+       axis.text.y = element_blank(),
+       axis.ticks = element_blank()
+     )
+
+main <- ggplot(wine, aes(x = pH, y = alcohol, 
+                 color=factor(wine$quality))) + 
+  geom_point() +
+  theme(legend.position=c(1,1),legend.justification=c(1,1))
+
+top <- ggplot(wine, aes(x = pH, 
+                 fill=factor(wine$quality))) + 
+  geom_density(alpha=0.5) + 
+  theme(legend.position = "none")
+  
+right <- ggplot(wine, aes(x = alcohol, 
+                 fill=factor(wine$quality))) + 
+  coord_flip() + 
+  geom_density(alpha=0.5) + 
+  theme(legend.position = "none")
+  
+grid.arrange(top, empty, main, right, ncol=2, nrow=2, widths=c(4, 1),
+             heights=c(1, 4))
+```
+
+Again we see that the higher quality wines are concentrated more in the center.
+
+# Multivariate Analysis
+
+### Talk about some of the relationships you observed in this part of the \
+investigation. Were there features that strengthened each other in terms of \
+looking at your feature(s) of interest?
+
+The main relationshps explored were between the pH and alcohol content. 
+
+Wines that have a mid-range pH and alcohol conent tend to have higher quality.
+
+
+### Were there any interesting or surprising interactions between features?
+
+The relationship between pH and alcohol is interesting.
+
+
+------
+
+# Final Plots and Summary
+
+
+### Plot One
+```{r echo=FALSE, Plot_One}
+ggplot(wine, aes(x = alcohol, y = quality)) + 
+  geom_jitter() +
+  ylab("Quality Rating")+
+  xlab("Alcohol (% by Volume)")+
+  geom_smooth(method = 'lm', color = 'red')+
+  ggtitle("Higher alcohol, higher quality")+
+  theme(plot.title = element_text(hjust = 0.5, size = 20), 
+        text = element_text(size = 12))
+
+```
+
+### Description One
+This plot demonstrates how the quality of a wine increases as the alcohol 
+content increase. We see a high concentration of the points in the middle
+of the quality axis.
+
+### Plot Two
+```{r echo=FALSE, Plot_Two}
+ggplot(wine, aes(x = pH , y = alcohol)) + 
+  geom_point() +
+  ylab("Alcohol (% by Volume)")+
+  xlab("pH")+
+  geom_smooth(method = 'lm', color = 'blue')+
+  ggtitle("Alcohol and pH")+
+  theme(plot.title = element_text(hjust = 0.5, size = 20), 
+        text = element_text(size = 12))
+
+```
+
+### Description Two
+This plot shows the relationship between pH and Alcohol. We see that the pH 
+slightly increases as the alcohol content gets higher. We can also see how the
+points are more spread out as the alcohol content gets higher and they get more
+condensed the lower the alcohol content is. 
+
+### Plot Three
+```{r echo=FALSE, Plot_Three}
+empty <- ggplot()+geom_point(aes(1,1), colour="white") +
+     theme(                              
+       plot.background = element_blank(), 
+       panel.grid.major = element_blank(), 
+       panel.grid.minor = element_blank(), 
+       panel.border = element_blank(), 
+       panel.background = element_blank(),
+       axis.title.x = element_blank(),
+       axis.title.y = element_blank(),
+       axis.text.x = element_blank(),
+       axis.text.y = element_blank(),
+       axis.ticks = element_blank()
+     )
+
+ggplot(wine, aes(x = pH, y = alcohol, color=factor(wine$quality))) + 
+  geom_point() +
+  ylab("Alcohol (% by Volume)")+
+  xlab("pH")+
+  ggtitle("Alcohol, pH, and Quality")+
+  theme(plot.title = element_text(hjust = 0.5, size = 20), text = element_text(size = 12),
+        legend.position=c(1,1),legend.justification=c(1,1))
+
+
+
+```
+
+### Description Three
+This plot shows the relationship between the alcohol, pH, and quality of the 
+wines. We see the higher quality wines represented by the blue and pink colors. 
+The highest density of those colors tends to be in the center of each of the 
+plots. 
+
+We also see a majority of the dots on the plot are green and blue. This 
+demonstrates what we saw in the Univariate exploration. 
+------
+
+# Reflection
+
+This project was interesting as I was able to put my new found knowledge of
+the plotting functionality of R to the test on a real dataset. There are 
+several ways I could have gone with this data and I found it difficult trying 
+to narrow down my exploration. This dataset was already clean which made it 
+easy to work with. 
+
+Future work with this dataset could include combining the white wine dataset
+with this dataset to find if there are differences when it comes to red vs
+white wines. 
